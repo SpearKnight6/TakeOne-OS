@@ -11,10 +11,10 @@ export default async function DashboardPage() {
     const data = await getDashboardData();
 
     return (
-      <div className="grid">
+      <div className="crud-grid">
         <section className="section">
           <h2>Dashboard</h2>
-          <div className="grid cards">
+          <div className="crud-grid cards">
             <article className="card"><strong>{data.activeProjects}</strong><div>Active projects</div></article>
             <article className="card"><strong>{data.pendingApprovals}</strong><div>Pending approvals</div></article>
             <article className="card"><strong>{data.overdueTasks}</strong><div>Overdue tasks</div></article>

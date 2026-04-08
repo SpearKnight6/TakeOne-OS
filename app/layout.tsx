@@ -1,13 +1,13 @@
-import './globals.css';
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import './globals.css';
 
-export const metadata = {
-  title: 'TakeOne-OS',
-  description: 'Production workflow MVP'
+export const metadata: Metadata = {
+  title: 'TakeOne OS MVP',
+  description: 'Lightweight production ops MVP optimized for free tiers.'
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
