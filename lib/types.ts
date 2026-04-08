@@ -50,3 +50,12 @@ export interface Approval {
   reviewer: string | null;
   created_at: string;
 }
+
+export interface VersionEntry {
+  id: string;
+  project_id: string;
+  item_name: string;
+  version_label: string;
+  changelog: string;
+  external_asset_url: string;
+}
