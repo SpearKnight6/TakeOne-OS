@@ -6,11 +6,42 @@ import { EmptyState } from '@/components/EmptyState';
 import { ErrorState } from '@/components/ErrorState';
 import { StatusBadge } from '@/components/StatusBadge';
 import { ensureDefaultCampaignLifecycle, ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
+import { CampaignLifecycleStatus, CampaignPillarStatus } from '@/lib/types';
+
+const CAMPAIGN_STATUS_WEIGHTS: Record<CampaignPillarStatus | CampaignLifecycleStatus, number> = {
+  'not started': 0,
+  'in progress': 50,
+  blocked: 25,
+  done: 100
+};
+
+const LIFECYCLE_PHASE_ORDER = ['Pre-Production', 'Production', 'Post-Production', 'Launch', 'Post-Launch'] as const;
 
 function isOverdue(dueDate: string | null, status: string) {
   if (!dueDate || status === 'done') return false;
   const today = new Date().toISOString().slice(0, 10);
   return dueDate < today;
+}
+
+function calculateReadiness(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus>) {
+  if (statuses.length === 0) return 0;
+  const total = statuses.reduce((sum, status) => sum + CAMPAIGN_STATUS_WEIGHTS[status], 0);
+  return Math.round(total / statuses.length);
+}
+
+function getStatusCounts(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus>) {
+  return statuses.reduce(
+    (acc, status) => {
+      acc[status] += 1;
+      return acc;
+    },
+    {
+      'not started': 0,
+      'in progress': 0,
+      blocked: 0,
+      done: 0
+    } as Record<CampaignPillarStatus | CampaignLifecycleStatus, number>
+  );
 }
 
 export default async function ProjectDetailPage({
@@ -42,6 +73,15 @@ export default async function ProjectDetailPage({
   if (assetError) return <ErrorState message={assetError.message} />;
   if (campaignPillarsError) return <ErrorState message={campaignPillarsError.message} />;
   if (campaignLifecycleError) return <ErrorState message={campaignLifecycleError.message} />;
+
+  const campaignOSStatuses = campaignPillars.map((pillar) => pillar.status);
+  const lifecycleStatuses = campaignLifecycle.map((phase) => phase.status);
+  const campaignOsReadiness = calculateReadiness(campaignOSStatuses);
+  const lifecycleReadiness = calculateReadiness(lifecycleStatuses);
+  const overallCampaignHealth = calculateReadiness([...campaignOSStatuses, ...lifecycleStatuses]);
+  const campaignOSCounts = getStatusCounts(campaignOSStatuses);
+  const lifecycleCounts = getStatusCounts(lifecycleStatuses);
+  const lifecycleByPhaseName = new Map(campaignLifecycle.map((phase) => [phase.phase_name, phase]));
 
   const versionsByAsset = await Promise.all(assets.map(async (asset) => ({
     assetId: asset.id,
@@ -82,8 +122,37 @@ export default async function ProjectDetailPage({
         </form>
       </section>
 
+      <section className="section card campaign-summary">
+        <div className="campaign-section-head">
+          <h3>Campaign Summary</h3>
+          <p className="muted">Command-center snapshot of campaign readiness and execution risk.</p>
+        </div>
+        <div className="campaign-summary-grid">
+          <article className="campaign-summary-card">
+            <p className="campaign-summary-label">Campaign OS Readiness</p>
+            <p className="campaign-summary-value">{campaignOsReadiness}%</p>
+          </article>
+          <article className="campaign-summary-card">
+            <p className="campaign-summary-label">Campaign Lifecycle Readiness</p>
+            <p className="campaign-summary-value">{lifecycleReadiness}%</p>
+          </article>
+          <article className="campaign-summary-card campaign-summary-card--health">
+            <p className="campaign-summary-label">Overall Campaign Health</p>
+            <p className="campaign-summary-value">{overallCampaignHealth}%</p>
+          </article>
+        </div>
+      </section>
+
       <section className="section card">
-        <h3>Campaign OS</h3>
+        <div className="campaign-section-head">
+          <h3>Campaign OS</h3>
+          <div className="campaign-status-summary">
+            <StatusBadge label={`not started: ${campaignOSCounts['not started']}`} />
+            <StatusBadge label={`in progress: ${campaignOSCounts['in progress']}`} />
+            <StatusBadge label={`blocked: ${campaignOSCounts.blocked}`} />
+            <StatusBadge label={`done: ${campaignOSCounts.done}`} />
+          </div>
+        </div>
         <p className="muted campaign-os-helper">Film marketing strategy synced to delivery workflow. One pillar card maps to one row in <code>campaign_pillars</code>.</p>
         {campaignPillars.length === 0 ? <EmptyState message="No campaign pillars available yet." /> : (
           <div className="campaign-os-grid">
@@ -129,8 +198,27 @@ export default async function ProjectDetailPage({
       </section>
 
       <section className="section card">
-        <h3>Campaign Lifecycle</h3>
+        <div className="campaign-section-head">
+          <h3>Campaign Lifecycle</h3>
+          <div className="campaign-status-summary">
+            <StatusBadge label={`not started: ${lifecycleCounts['not started']}`} />
+            <StatusBadge label={`in progress: ${lifecycleCounts['in progress']}`} />
+            <StatusBadge label={`blocked: ${lifecycleCounts.blocked}`} />
+            <StatusBadge label={`done: ${lifecycleCounts.done}`} />
+          </div>
+        </div>
         <p className="muted campaign-os-helper">Five lifecycle phases from pre-production to post-launch. One lifecycle card maps to one row in <code>campaign_lifecycle</code>.</p>
+        <div className="lifecycle-tracker">
+          {LIFECYCLE_PHASE_ORDER.map((phaseName) => {
+            const phase = lifecycleByPhaseName.get(phaseName);
+            return (
+              <article key={phaseName} className="lifecycle-phase">
+                <span className="lifecycle-phase-name">{phaseName}</span>
+                <StatusBadge label={phase?.status ?? 'not started'} />
+              </article>
+            );
+          })}
+        </div>
         {campaignLifecycle.length === 0 ? <EmptyState message="No campaign lifecycle phases available yet." /> : (
           <div className="campaign-os-grid">
             {campaignLifecycle.map((phase) => (

@@ -135,6 +135,16 @@ button {
   color: #166534;
 }
 
+.badge.blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge.gray {
+  background: #e5e7eb;
+  color: #374151;
+}
+
 .muted {
   color: #6b7280;
   font-size: 14px;
@@ -147,7 +157,7 @@ button {
 }
 
 .campaign-os-helper {
-  margin-bottom: 16px;
+  margin: 6px 0 16px;
 }
 
 .campaign-os-grid {
@@ -194,6 +204,87 @@ button {
   color: #111827;
 }
 
+.campaign-summary {
+  border: 1px solid #dbeafe;
+  background: linear-gradient(165deg, #ffffff 0%, #eff6ff 100%);
+}
+
+.campaign-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.campaign-section-head h3 {
+  margin: 0;
+}
+
+.campaign-summary-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.campaign-summary-card {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px;
+}
+
+.campaign-summary-card--health {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.campaign-summary-label {
+  margin: 0 0 4px;
+  color: #4b5563;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.campaign-summary-value {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.campaign-status-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lifecycle-tracker {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+  grid-template-columns: 1fr;
+}
+
+.lifecycle-phase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 10px;
+}
+
+.lifecycle-phase-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
 @media (min-width: 900px) {
   .split {
     grid-template-columns: 1fr 1fr;
@@ -205,6 +296,31 @@ button {
 
   .campaign-os-meta-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lifecycle-tracker {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .lifecycle-phase {
+    position: relative;
+    min-height: 72px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .lifecycle-phase::after {
+    content: '';
+    position: absolute;
+    top: 35px;
+    left: calc(100% + 6px);
+    width: 10px;
+    border-top: 2px dashed #cbd5e1;
+  }
+
+  .lifecycle-phase:last-child::after {
+    display: none;
   }
 }
 
