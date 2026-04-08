@@ -1,0 +1,52 @@
+export type ProjectStatus = 'active' | 'on hold' | 'completed';
+export type TaskStatus = 'todo' | 'in progress' | 'blocked' | 'done';
+export type VersionStatus = 'draft' | 'in review' | 'approved';
+export type ApprovalStatus = 'pending review' | 'approved' | 'changes requested';
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  status: ProjectStatus;
+  due_date: string | null;
+  created_at: string;
+}
+
+export interface Task {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  due_date: string | null;
+  created_at: string;
+}
+
+export interface Asset {
+  id: string;
+  project_id: string;
+  title: string;
+  asset_type: string;
+  external_file_url: string;
+  description: string | null;
+  created_at: string;
+}
+
+export interface AssetVersion {
+  id: string;
+  asset_id: string;
+  version_number: string;
+  notes: string | null;
+  status: VersionStatus;
+  external_file_url: string;
+  created_at: string;
+}
+
+export interface Approval {
+  id: string;
+  version_id: string;
+  status: ApprovalStatus;
+  comment: string;
+  reviewer: string | null;
+  created_at: string;
+}
