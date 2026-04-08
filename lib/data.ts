@@ -1,5 +1,5 @@
 import { getSupabase } from './supabase';
-import { Approval, Asset, AssetVersion, CampaignPillar, Project, Task } from './types';
+import { Approval, Asset, AssetVersion, CampaignLifecycle, CampaignPillar, Project, Task } from './types';
 
 const DEFAULT_CAMPAIGN_PILLARS = [
   'First Signal',
@@ -7,6 +7,14 @@ const DEFAULT_CAMPAIGN_PILLARS = [
   'Build-Up Engine',
   'Hype Flow',
   'Ground Pulse'
+] as const;
+
+const DEFAULT_CAMPAIGN_LIFECYCLE_PHASES = [
+  'Pre-Production',
+  'Production',
+  'Post-Production',
+  'Launch',
+  'Post-Launch'
 ] as const;
 
 export interface DashboardData {
@@ -112,6 +120,37 @@ export async function ensureDefaultCampaignPillars(projectId: string) {
     const { error: insertError } = await supabase.from('campaign_pillars').insert(seed);
     if (insertError) return { data: [] as CampaignPillar[], error: insertError };
     return getCampaignPillarsByProject(projectId);
+  }
+
+  return { data, error: null };
+}
+
+export async function getCampaignLifecycleByProject(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('campaign_lifecycle')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+
+  return { data: (data ?? []) as CampaignLifecycle[], error };
+}
+
+export async function ensureDefaultCampaignLifecycle(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await getCampaignLifecycleByProject(projectId);
+  if (error) return { data: [] as CampaignLifecycle[], error };
+
+  if (data.length === 0) {
+    const seed = DEFAULT_CAMPAIGN_LIFECYCLE_PHASES.map((phaseName) => ({
+      project_id: projectId,
+      phase_name: phaseName,
+      status: 'not started'
+    }));
+
+    const { error: insertError } = await supabase.from('campaign_lifecycle').insert(seed);
+    if (insertError) return { data: [] as CampaignLifecycle[], error: insertError };
+    return getCampaignLifecycleByProject(projectId);
   }
 
   return { data, error: null };
