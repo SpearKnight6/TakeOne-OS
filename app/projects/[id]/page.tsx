@@ -81,13 +81,13 @@ export default async function ProjectDetailPage({
 
       <section className="section card">
         <h3>Campaign OS</h3>
-        <p className="muted">Film marketing strategy synced to delivery workflow.</p>
+        <p className="muted campaign-os-helper">Film marketing strategy synced to delivery workflow. One pillar card maps to one row in <code>campaign_pillars</code>.</p>
         {campaignPillars.length === 0 ? <EmptyState message="No campaign pillars available yet." /> : (
-          <div className="crud-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          <div className="campaign-os-grid">
             {campaignPillars.map((pillar) => (
-              <article key={pillar.id} className="card">
-                <h4>{pillar.pillar_name}</h4>
-                <form action={upsertCampaignPillar} className="form">
+              <article key={pillar.id} className="card campaign-os-card">
+                <h4 className="campaign-os-title">{pillar.pillar_name}</h4>
+                <form action={upsertCampaignPillar} className="campaign-os-form">
                   <input type="hidden" name="id" value={pillar.id} />
                   <input type="hidden" name="project_id" value={project.id} />
                   <label>
@@ -98,7 +98,7 @@ export default async function ProjectDetailPage({
                     Notes
                     <textarea name="notes" defaultValue={pillar.notes ?? ''} rows={3} />
                   </label>
-                  <div className="form-row">
+                  <div className="campaign-os-meta-grid">
                     <label>
                       Owner
                       <input name="owner" defaultValue={pillar.owner ?? ''} placeholder="Owner" />
