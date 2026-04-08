@@ -2,6 +2,7 @@ export type ProjectStatus = 'active' | 'on hold' | 'completed';
 export type TaskStatus = 'todo' | 'in progress' | 'blocked' | 'done';
 export type VersionStatus = 'draft' | 'in review' | 'approved';
 export type ApprovalStatus = 'pending review' | 'approved' | 'changes requested';
+export type CampaignPillarStatus = 'not started' | 'in progress' | 'blocked' | 'done';
 
 export interface Project {
   id: string;
@@ -58,4 +59,17 @@ export interface VersionEntry {
   version_label: string;
   changelog: string;
   external_asset_url: string;
+}
+
+export interface CampaignPillar {
+  id: string;
+  project_id: string;
+  pillar_name: string;
+  objective: string | null;
+  notes: string | null;
+  owner: string | null;
+  status: CampaignPillarStatus;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
 }

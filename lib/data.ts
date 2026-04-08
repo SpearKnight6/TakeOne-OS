@@ -1,5 +1,13 @@
 import { getSupabase } from './supabase';
-import { Approval, Asset, AssetVersion, Project, Task } from './types';
+import { Approval, Asset, AssetVersion, CampaignPillar, Project, Task } from './types';
+
+const DEFAULT_CAMPAIGN_PILLARS = [
+  'First Signal',
+  'Audience Lock',
+  'Build-Up Engine',
+  'Hype Flow',
+  'Ground Pulse'
+] as const;
 
 export interface DashboardData {
   activeProjects: number;
@@ -76,4 +84,35 @@ export async function getDashboardData(): Promise<DashboardData> {
       project_name: item.projects?.name
     }))
   };
+}
+
+export async function getCampaignPillarsByProject(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('campaign_pillars')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+
+  return { data: (data ?? []) as CampaignPillar[], error };
+}
+
+export async function ensureDefaultCampaignPillars(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await getCampaignPillarsByProject(projectId);
+  if (error) return { data: [] as CampaignPillar[], error };
+
+  if (data.length === 0) {
+    const seed = DEFAULT_CAMPAIGN_PILLARS.map((pillarName) => ({
+      project_id: projectId,
+      pillar_name: pillarName,
+      status: 'not started'
+    }));
+
+    const { error: insertError } = await supabase.from('campaign_pillars').insert(seed);
+    if (insertError) return { data: [] as CampaignPillar[], error: insertError };
+    return getCampaignPillarsByProject(projectId);
+  }
+
+  return { data, error: null };
 }
