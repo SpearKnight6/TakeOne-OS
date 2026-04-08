@@ -1,35 +1,52 @@
-export type Project = {
+export type ProjectStatus = 'active' | 'on hold' | 'completed';
+export type TaskStatus = 'todo' | 'in progress' | 'blocked' | 'done';
+export type VersionStatus = 'draft' | 'in review' | 'approved';
+export type ApprovalStatus = 'pending review' | 'approved' | 'changes requested';
+
+export interface Project {
   id: string;
   name: string;
-  status: 'active' | 'on_hold' | 'done';
-  due_date: string;
-  owner: string;
-};
+  description: string | null;
+  status: ProjectStatus;
+  due_date: string | null;
+  created_at: string;
+}
 
-export type Task = {
+export interface Task {
   id: string;
   project_id: string;
   title: string;
-  status: 'todo' | 'doing' | 'done';
-  assignee: string;
-  due_date: string;
-};
+  description: string | null;
+  status: TaskStatus;
+  due_date: string | null;
+  created_at: string;
+}
 
-export type Approval = {
+export interface Asset {
   id: string;
   project_id: string;
-  item_title: string;
-  requested_by: string;
-  approver: string;
-  status: 'pending' | 'approved' | 'changes_requested';
-  external_asset_url: string | null;
-};
+  title: string;
+  asset_type: string;
+  external_file_url: string;
+  description: string | null;
+  created_at: string;
+}
 
-export type VersionEntry = {
+export interface AssetVersion {
   id: string;
-  project_id: string;
-  item_name: string;
-  version_label: string;
-  changelog: string;
-  external_asset_url: string;
-};
+  asset_id: string;
+  version_number: string;
+  notes: string | null;
+  status: VersionStatus;
+  external_file_url: string;
+  created_at: string;
+}
+
+export interface Approval {
+  id: string;
+  version_id: string;
+  status: ApprovalStatus;
+  comment: string;
+  reviewer: string | null;
+  created_at: string;
+}
