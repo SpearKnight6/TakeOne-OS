@@ -146,3 +146,23 @@ export async function upsertCampaignLifecycle(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath(`/projects/${projectId}`);
 }
+
+export async function upsertCampaignMilestone(formData: FormData) {
+  const supabase = getSupabase();
+  const id = text(formData, 'id');
+  const projectId = text(formData, 'project_id');
+  const updates = {
+    milestone_name: text(formData, 'milestone_name'),
+    phase: text(formData, 'phase') || null,
+    target_date: text(formData, 'target_date') || null,
+    status: text(formData, 'status') || 'not started',
+    linked_assets: text(formData, 'linked_assets') || null,
+    approvals: text(formData, 'approvals') || null,
+    notes: text(formData, 'notes') || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase.from('campaign_milestones').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/projects/${projectId}`);
+}

@@ -77,11 +77,27 @@ create table if not exists campaign_lifecycle (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists campaign_milestones (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references projects(id) on delete cascade,
+  milestone_name text not null,
+  phase text,
+  target_date date,
+  status text not null default 'not started',
+  linked_assets text,
+  approvals text,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists idx_campaign_pillars_project_id on campaign_pillars(project_id);
 create index if not exists idx_campaign_lifecycle_project_id on campaign_lifecycle(project_id);
+create index if not exists idx_campaign_milestones_project_id on campaign_milestones(project_id);
 
 alter table campaign_pillars enable row level security;
 alter table campaign_lifecycle enable row level security;
+alter table campaign_milestones enable row level security;
 
 drop policy if exists "campaign pillars public access" on campaign_pillars;
 create policy "campaign pillars public access" on campaign_pillars
@@ -91,6 +107,12 @@ with check (auth.role() in ('anon', 'authenticated'));
 
 drop policy if exists "campaign lifecycle public access" on campaign_lifecycle;
 create policy "campaign lifecycle public access" on campaign_lifecycle
+for all
+using (auth.role() in ('anon', 'authenticated'))
+with check (auth.role() in ('anon', 'authenticated'));
+
+drop policy if exists "campaign milestones public access" on campaign_milestones;
+create policy "campaign milestones public access" on campaign_milestones
 for all
 using (auth.role() in ('anon', 'authenticated'))
 with check (auth.role() in ('anon', 'authenticated'));

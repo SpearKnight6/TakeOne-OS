@@ -1,5 +1,5 @@
 import { getSupabase } from './supabase';
-import { Approval, Asset, AssetVersion, CampaignLifecycle, CampaignPillar, Project, Task } from './types';
+import { Approval, Asset, AssetVersion, CampaignLifecycle, CampaignMilestone, CampaignPillar, Project, Task } from './types';
 
 const DEFAULT_CAMPAIGN_PILLARS = [
   'First Signal',
@@ -15,6 +15,17 @@ const DEFAULT_CAMPAIGN_LIFECYCLE_PHASES = [
   'Post-Production',
   'Launch',
   'Post-Launch'
+] as const;
+
+const DEFAULT_CAMPAIGN_MILESTONES = [
+  { milestone_name: 'First Look', phase: 'Pre-Production' },
+  { milestone_name: 'Title Reveal', phase: 'Pre-Production' },
+  { milestone_name: 'Character Intro', phase: 'Production' },
+  { milestone_name: 'First Song', phase: 'Production' },
+  { milestone_name: 'Teaser', phase: 'Post-Production' },
+  { milestone_name: 'Trailer', phase: 'Launch' },
+  { milestone_name: 'Release Week', phase: 'Launch' },
+  { milestone_name: 'OTT Window', phase: 'Post-Launch' }
 ] as const;
 
 export interface DashboardData {
@@ -151,6 +162,38 @@ export async function ensureDefaultCampaignLifecycle(projectId: string) {
     const { error: insertError } = await supabase.from('campaign_lifecycle').insert(seed);
     if (insertError) return { data: [] as CampaignLifecycle[], error: insertError };
     return getCampaignLifecycleByProject(projectId);
+  }
+
+  return { data, error: null };
+}
+
+export async function getCampaignMilestonesByProject(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('campaign_milestones')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: true });
+
+  return { data: (data ?? []) as CampaignMilestone[], error };
+}
+
+export async function ensureDefaultCampaignMilestones(projectId: string) {
+  const supabase = getSupabase();
+  const { data, error } = await getCampaignMilestonesByProject(projectId);
+  if (error) return { data: [] as CampaignMilestone[], error };
+
+  if (data.length === 0) {
+    const seed = DEFAULT_CAMPAIGN_MILESTONES.map((milestone) => ({
+      project_id: projectId,
+      milestone_name: milestone.milestone_name,
+      phase: milestone.phase,
+      status: 'not started'
+    }));
+
+    const { error: insertError } = await supabase.from('campaign_milestones').insert(seed);
+    if (insertError) return { data: [] as CampaignMilestone[], error: insertError };
+    return getCampaignMilestonesByProject(projectId);
   }
 
   return { data, error: null };
