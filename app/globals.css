@@ -171,6 +171,19 @@ button {
   border-radius: 10px;
 }
 
+.campaign-milestone-card {
+  border-color: #c7d2fe;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+}
+
+.campaign-milestone-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
 .campaign-os-title {
   margin: 0 0 10px;
   font-size: 1rem;

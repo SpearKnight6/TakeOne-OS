@@ -1,14 +1,14 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus, upsertCampaignLifecycle, upsertCampaignPillar } from '@/app/actions';
+import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus, upsertCampaignLifecycle, upsertCampaignMilestone, upsertCampaignPillar } from '@/app/actions';
 import { EmptyState } from '@/components/EmptyState';
 import { ErrorState } from '@/components/ErrorState';
 import { StatusBadge } from '@/components/StatusBadge';
-import { ensureDefaultCampaignLifecycle, ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
-import { CampaignLifecycleStatus, CampaignPillarStatus } from '@/lib/types';
+import { ensureDefaultCampaignLifecycle, ensureDefaultCampaignMilestones, ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
+import { CampaignLifecycleStatus, CampaignMilestoneStatus, CampaignPillarStatus } from '@/lib/types';
 
-const CAMPAIGN_STATUS_WEIGHTS: Record<CampaignPillarStatus | CampaignLifecycleStatus, number> = {
+const CAMPAIGN_STATUS_WEIGHTS: Record<CampaignPillarStatus | CampaignLifecycleStatus | CampaignMilestoneStatus, number> = {
   'not started': 0,
   'in progress': 50,
   blocked: 25,
@@ -23,13 +23,13 @@ function isOverdue(dueDate: string | null, status: string) {
   return dueDate < today;
 }
 
-function calculateReadiness(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus>) {
+function calculateReadiness(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus | CampaignMilestoneStatus>) {
   if (statuses.length === 0) return 0;
   const total = statuses.reduce((sum, status) => sum + CAMPAIGN_STATUS_WEIGHTS[status], 0);
   return Math.round(total / statuses.length);
 }
 
-function getStatusCounts(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus>) {
+function getStatusCounts(statuses: Array<CampaignPillarStatus | CampaignLifecycleStatus | CampaignMilestoneStatus>) {
   return statuses.reduce(
     (acc, status) => {
       acc[status] += 1;
@@ -40,7 +40,7 @@ function getStatusCounts(statuses: Array<CampaignPillarStatus | CampaignLifecycl
       'in progress': 0,
       blocked: 0,
       done: 0
-    } as Record<CampaignPillarStatus | CampaignLifecycleStatus, number>
+    } as Record<CampaignPillarStatus | CampaignLifecycleStatus | CampaignMilestoneStatus, number>
   );
 }
 
@@ -61,26 +61,32 @@ export default async function ProjectDetailPage({
     { data: tasks, error: taskError },
     { data: assets, error: assetError },
     { data: campaignPillars, error: campaignPillarsError },
-    { data: campaignLifecycle, error: campaignLifecycleError }
+    { data: campaignLifecycle, error: campaignLifecycleError },
+    { data: campaignMilestones, error: campaignMilestonesError }
   ] = await Promise.all([
     getTasksByProject(project.id, taskStatusFilter),
     getAssetsByProject(project.id),
     ensureDefaultCampaignPillars(project.id),
-    ensureDefaultCampaignLifecycle(project.id)
+    ensureDefaultCampaignLifecycle(project.id),
+    ensureDefaultCampaignMilestones(project.id)
   ]);
 
   if (taskError) return <ErrorState message={taskError.message} />;
   if (assetError) return <ErrorState message={assetError.message} />;
   if (campaignPillarsError) return <ErrorState message={campaignPillarsError.message} />;
   if (campaignLifecycleError) return <ErrorState message={campaignLifecycleError.message} />;
+  if (campaignMilestonesError) return <ErrorState message={campaignMilestonesError.message} />;
 
   const campaignOSStatuses = campaignPillars.map((pillar) => pillar.status);
   const lifecycleStatuses = campaignLifecycle.map((phase) => phase.status);
+  const milestoneStatuses = campaignMilestones.map((milestone) => milestone.status);
   const campaignOsReadiness = calculateReadiness(campaignOSStatuses);
   const lifecycleReadiness = calculateReadiness(lifecycleStatuses);
-  const overallCampaignHealth = calculateReadiness([...campaignOSStatuses, ...lifecycleStatuses]);
+  const milestonesReadiness = calculateReadiness(milestoneStatuses);
+  const overallCampaignHealth = calculateReadiness([...campaignOSStatuses, ...lifecycleStatuses, ...milestoneStatuses]);
   const campaignOSCounts = getStatusCounts(campaignOSStatuses);
   const lifecycleCounts = getStatusCounts(lifecycleStatuses);
+  const milestoneCounts = getStatusCounts(milestoneStatuses);
   const lifecycleByPhaseName = new Map(campaignLifecycle.map((phase) => [phase.phase_name, phase]));
 
   const versionsByAsset = await Promise.all(assets.map(async (asset) => ({
@@ -136,6 +142,10 @@ export default async function ProjectDetailPage({
             <p className="campaign-summary-label">Campaign Lifecycle Readiness</p>
             <p className="campaign-summary-value">{lifecycleReadiness}%</p>
           </article>
+          <article className="campaign-summary-card">
+            <p className="campaign-summary-label">Milestones Readiness</p>
+            <p className="campaign-summary-value">{milestonesReadiness}%</p>
+          </article>
           <article className="campaign-summary-card campaign-summary-card--health">
             <p className="campaign-summary-label">Overall Campaign Health</p>
             <p className="campaign-summary-value">{overallCampaignHealth}%</p>
@@ -190,6 +200,71 @@ export default async function ProjectDetailPage({
                     </label>
                   </div>
                   <button type="submit">Save pillar</button>
+                </form>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section card">
+        <div className="campaign-section-head">
+          <h3>Campaign Milestones</h3>
+          <div className="campaign-status-summary">
+            <StatusBadge label={`not started: ${milestoneCounts['not started']}`} />
+            <StatusBadge label={`in progress: ${milestoneCounts['in progress']}`} />
+            <StatusBadge label={`blocked: ${milestoneCounts.blocked}`} />
+            <StatusBadge label={`done: ${milestoneCounts.done}`} />
+          </div>
+        </div>
+        <p className="muted campaign-os-helper">Film ops command center for campaign drops and release moments. One milestone card maps to one row in <code>campaign_milestones</code>.</p>
+        {campaignMilestones.length === 0 ? <EmptyState message="No campaign milestones available yet." /> : (
+          <div className="campaign-os-grid">
+            {campaignMilestones.map((milestone) => (
+              <article key={milestone.id} className="card campaign-os-card campaign-milestone-card">
+                <div className="campaign-milestone-header">
+                  <h4 className="campaign-os-title">{milestone.milestone_name}</h4>
+                  <StatusBadge label={milestone.status} />
+                </div>
+                <form action={upsertCampaignMilestone} className="campaign-os-form">
+                  <input type="hidden" name="id" value={milestone.id} />
+                  <input type="hidden" name="project_id" value={project.id} />
+                  <label>
+                    Milestone Name
+                    <input name="milestone_name" defaultValue={milestone.milestone_name} required />
+                  </label>
+                  <div className="campaign-os-meta-grid">
+                    <label>
+                      Phase
+                      <input name="phase" defaultValue={milestone.phase ?? ''} placeholder="Launch" />
+                    </label>
+                    <label>
+                      Target Date
+                      <input type="date" name="target_date" defaultValue={milestone.target_date ?? ''} />
+                    </label>
+                    <label>
+                      Status
+                      <select name="status" defaultValue={milestone.status}>
+                        <option value="not started">not started</option>
+                        <option value="in progress">in progress</option>
+                        <option value="blocked">blocked</option>
+                        <option value="done">done</option>
+                      </select>
+                    </label>
+                  </div>
+                  <label>
+                    Linked Assets
+                    <textarea name="linked_assets" defaultValue={milestone.linked_assets ?? ''} rows={2} placeholder="Trailer cut v2, hero poster, influencer toolkit" />
+                  </label>
+                  <label>
+                    Approvals
+                    <textarea name="approvals" defaultValue={milestone.approvals ?? ''} rows={2} placeholder="Studio, legal, music, talent" />
+                  </label>
+                  <label>
+                    Notes
+                    <textarea name="notes" defaultValue={milestone.notes ?? ''} rows={3} />
+                  </label>
+                  <button type="submit">Save milestone</button>
                 </form>
               </article>
             ))}

@@ -4,6 +4,7 @@ export type VersionStatus = 'draft' | 'in review' | 'approved';
 export type ApprovalStatus = 'pending review' | 'approved' | 'changes requested';
 export type CampaignPillarStatus = 'not started' | 'in progress' | 'blocked' | 'done';
 export type CampaignLifecycleStatus = 'not started' | 'in progress' | 'blocked' | 'done';
+export type CampaignMilestoneStatus = 'not started' | 'in progress' | 'blocked' | 'done';
 
 export interface Project {
   id: string;
@@ -85,6 +86,20 @@ export interface CampaignLifecycle {
   key_assets: string | null;
   kpi: string | null;
   status: CampaignLifecycleStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignMilestone {
+  id: string;
+  project_id: string;
+  milestone_name: string;
+  phase: string | null;
+  target_date: string | null;
+  status: CampaignMilestoneStatus;
+  linked_assets: string | null;
+  approvals: string | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
