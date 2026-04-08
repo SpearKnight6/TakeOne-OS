@@ -109,3 +109,21 @@ export async function createApproval(formData: FormData) {
   revalidatePath('/');
   revalidatePath(`/projects/${projectId}`);
 }
+
+export async function upsertCampaignPillar(formData: FormData) {
+  const supabase = getSupabase();
+  const id = text(formData, 'id');
+  const projectId = text(formData, 'project_id');
+  const updates = {
+    objective: text(formData, 'objective') || null,
+    notes: text(formData, 'notes') || null,
+    owner: text(formData, 'owner') || null,
+    status: text(formData, 'status') || 'not started',
+    due_date: text(formData, 'due_date') || null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase.from('campaign_pillars').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/projects/${projectId}`);
+}

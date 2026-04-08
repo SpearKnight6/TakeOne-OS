@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus } from '@/app/actions';
+import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus, upsertCampaignPillar } from '@/app/actions';
 import { EmptyState } from '@/components/EmptyState';
 import { ErrorState } from '@/components/ErrorState';
 import { StatusBadge } from '@/components/StatusBadge';
-import { getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
+import { ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
 
 function isOverdue(dueDate: string | null, status: string) {
   if (!dueDate || status === 'done') return false;
@@ -26,13 +26,19 @@ export default async function ProjectDetailPage({
   if (projectError) return <ErrorState message={projectError.message} />;
   if (!project) return <ErrorState message="Project not found." />;
 
-  const [{ data: tasks, error: taskError }, { data: assets, error: assetError }] = await Promise.all([
+  const [
+    { data: tasks, error: taskError },
+    { data: assets, error: assetError },
+    { data: campaignPillars, error: campaignPillarsError }
+  ] = await Promise.all([
     getTasksByProject(project.id, taskStatusFilter),
-    getAssetsByProject(project.id)
+    getAssetsByProject(project.id),
+    ensureDefaultCampaignPillars(project.id)
   ]);
 
   if (taskError) return <ErrorState message={taskError.message} />;
   if (assetError) return <ErrorState message={assetError.message} />;
+  if (campaignPillarsError) return <ErrorState message={campaignPillarsError.message} />;
 
   const versionsByAsset = await Promise.all(assets.map(async (asset) => ({
     assetId: asset.id,
@@ -71,6 +77,52 @@ export default async function ProjectDetailPage({
           <textarea name="description" defaultValue={project.description ?? ''} rows={3} />
           <button type="submit">Save project</button>
         </form>
+      </section>
+
+      <section className="section card">
+        <h3>Campaign OS</h3>
+        <p className="muted">Film marketing strategy synced to delivery workflow.</p>
+        {campaignPillars.length === 0 ? <EmptyState message="No campaign pillars available yet." /> : (
+          <div className="crud-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+            {campaignPillars.map((pillar) => (
+              <article key={pillar.id} className="card">
+                <h4>{pillar.pillar_name}</h4>
+                <form action={upsertCampaignPillar} className="form">
+                  <input type="hidden" name="id" value={pillar.id} />
+                  <input type="hidden" name="project_id" value={project.id} />
+                  <label>
+                    Objective
+                    <textarea name="objective" defaultValue={pillar.objective ?? ''} rows={2} />
+                  </label>
+                  <label>
+                    Notes
+                    <textarea name="notes" defaultValue={pillar.notes ?? ''} rows={3} />
+                  </label>
+                  <div className="form-row">
+                    <label>
+                      Owner
+                      <input name="owner" defaultValue={pillar.owner ?? ''} placeholder="Owner" />
+                    </label>
+                    <label>
+                      Status
+                      <select name="status" defaultValue={pillar.status}>
+                        <option value="not started">not started</option>
+                        <option value="in progress">in progress</option>
+                        <option value="blocked">blocked</option>
+                        <option value="done">done</option>
+                      </select>
+                    </label>
+                    <label>
+                      Due date
+                      <input type="date" name="due_date" defaultValue={pillar.due_date ?? ''} />
+                    </label>
+                  </div>
+                  <button type="submit">Save pillar</button>
+                </form>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="section card">
