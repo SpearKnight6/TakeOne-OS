@@ -67,11 +67,26 @@ create table if not exists campaign_pillars (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists campaign_lifecycle (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references projects(id) on delete cascade,
+  phase_name text not null,
+  objective text,
+  social_strategy text,
+  traction_goal text,
+  key_assets text,
+  kpi text,
+  status text not null default 'not started',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- Keep indexes small and practical for free-tier resources.
 create index if not exists idx_tasks_project on tasks(project_id);
 create index if not exists idx_approvals_project on approvals(project_id);
 create index if not exists idx_versions_project on version_entries(project_id);
 create index if not exists idx_campaign_pillars_project on campaign_pillars(project_id);
+create index if not exists idx_campaign_lifecycle_project on campaign_lifecycle(project_id);
 
 alter table profiles enable row level security;
 alter table projects enable row level security;
@@ -79,6 +94,7 @@ alter table tasks enable row level security;
 alter table approvals enable row level security;
 alter table version_entries enable row level security;
 alter table campaign_pillars enable row level security;
+alter table campaign_lifecycle enable row level security;
 
 -- Team-level access can be tightened later. MVP keeps simple "authenticated users can read/write" policies.
 create policy "profiles self read/write" on profiles
@@ -107,6 +123,11 @@ using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
 
 create policy "campaign pillars auth all" on campaign_pillars
+for all
+using (auth.role() = 'authenticated')
+with check (auth.role() = 'authenticated');
+
+create policy "campaign lifecycle auth all" on campaign_lifecycle
 for all
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');

@@ -1,11 +1,11 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus, upsertCampaignPillar } from '@/app/actions';
+import { createApproval, createAsset, createAssetVersion, createTask, updateProject, updateTaskStatus, upsertCampaignLifecycle, upsertCampaignPillar } from '@/app/actions';
 import { EmptyState } from '@/components/EmptyState';
 import { ErrorState } from '@/components/ErrorState';
 import { StatusBadge } from '@/components/StatusBadge';
-import { ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
+import { ensureDefaultCampaignLifecycle, ensureDefaultCampaignPillars, getApprovalsByVersion, getAssetsByProject, getProjectById, getTasksByProject, getVersionsByAsset } from '@/lib/data';
 
 function isOverdue(dueDate: string | null, status: string) {
   if (!dueDate || status === 'done') return false;
@@ -29,16 +29,19 @@ export default async function ProjectDetailPage({
   const [
     { data: tasks, error: taskError },
     { data: assets, error: assetError },
-    { data: campaignPillars, error: campaignPillarsError }
+    { data: campaignPillars, error: campaignPillarsError },
+    { data: campaignLifecycle, error: campaignLifecycleError }
   ] = await Promise.all([
     getTasksByProject(project.id, taskStatusFilter),
     getAssetsByProject(project.id),
-    ensureDefaultCampaignPillars(project.id)
+    ensureDefaultCampaignPillars(project.id),
+    ensureDefaultCampaignLifecycle(project.id)
   ]);
 
   if (taskError) return <ErrorState message={taskError.message} />;
   if (assetError) return <ErrorState message={assetError.message} />;
   if (campaignPillarsError) return <ErrorState message={campaignPillarsError.message} />;
+  if (campaignLifecycleError) return <ErrorState message={campaignLifecycleError.message} />;
 
   const versionsByAsset = await Promise.all(assets.map(async (asset) => ({
     assetId: asset.id,
@@ -118,6 +121,56 @@ export default async function ProjectDetailPage({
                     </label>
                   </div>
                   <button type="submit">Save pillar</button>
+                </form>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="section card">
+        <h3>Campaign Lifecycle</h3>
+        <p className="muted campaign-os-helper">Five lifecycle phases from pre-production to post-launch. One lifecycle card maps to one row in <code>campaign_lifecycle</code>.</p>
+        {campaignLifecycle.length === 0 ? <EmptyState message="No campaign lifecycle phases available yet." /> : (
+          <div className="campaign-os-grid">
+            {campaignLifecycle.map((phase) => (
+              <article key={phase.id} className="card campaign-os-card">
+                <h4 className="campaign-os-title">{phase.phase_name}</h4>
+                <form action={upsertCampaignLifecycle} className="campaign-os-form">
+                  <input type="hidden" name="id" value={phase.id} />
+                  <input type="hidden" name="project_id" value={project.id} />
+                  <label>
+                    Objective
+                    <textarea name="objective" defaultValue={phase.objective ?? ''} rows={2} />
+                  </label>
+                  <label>
+                    Social Strategy
+                    <textarea name="social_strategy" defaultValue={phase.social_strategy ?? ''} rows={3} />
+                  </label>
+                  <label>
+                    Traction Goal
+                    <textarea name="traction_goal" defaultValue={phase.traction_goal ?? ''} rows={2} />
+                  </label>
+                  <label>
+                    Key Assets
+                    <textarea name="key_assets" defaultValue={phase.key_assets ?? ''} rows={2} />
+                  </label>
+                  <div className="campaign-os-meta-grid">
+                    <label>
+                      KPI
+                      <input name="kpi" defaultValue={phase.kpi ?? ''} placeholder="KPI" />
+                    </label>
+                    <label>
+                      Status
+                      <select name="status" defaultValue={phase.status}>
+                        <option value="not started">not started</option>
+                        <option value="in progress">in progress</option>
+                        <option value="blocked">blocked</option>
+                        <option value="done">done</option>
+                      </select>
+                    </label>
+                  </div>
+                  <button type="submit">Save phase</button>
                 </form>
               </article>
             ))}

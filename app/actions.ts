@@ -127,3 +127,22 @@ export async function upsertCampaignPillar(formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath(`/projects/${projectId}`);
 }
+
+export async function upsertCampaignLifecycle(formData: FormData) {
+  const supabase = getSupabase();
+  const id = text(formData, 'id');
+  const projectId = text(formData, 'project_id');
+  const updates = {
+    objective: text(formData, 'objective') || null,
+    social_strategy: text(formData, 'social_strategy') || null,
+    traction_goal: text(formData, 'traction_goal') || null,
+    key_assets: text(formData, 'key_assets') || null,
+    kpi: text(formData, 'kpi') || null,
+    status: text(formData, 'status') || 'not started',
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabase.from('campaign_lifecycle').update(updates).eq('id', id);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/projects/${projectId}`);
+}

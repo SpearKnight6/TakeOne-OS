@@ -3,6 +3,7 @@ export type TaskStatus = 'todo' | 'in progress' | 'blocked' | 'done';
 export type VersionStatus = 'draft' | 'in review' | 'approved';
 export type ApprovalStatus = 'pending review' | 'approved' | 'changes requested';
 export type CampaignPillarStatus = 'not started' | 'in progress' | 'blocked' | 'done';
+export type CampaignLifecycleStatus = 'not started' | 'in progress' | 'blocked' | 'done';
 
 export interface Project {
   id: string;
@@ -70,6 +71,20 @@ export interface CampaignPillar {
   owner: string | null;
   status: CampaignPillarStatus;
   due_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CampaignLifecycle {
+  id: string;
+  project_id: string;
+  phase_name: string;
+  objective: string | null;
+  social_strategy: string | null;
+  traction_goal: string | null;
+  key_assets: string | null;
+  kpi: string | null;
+  status: CampaignLifecycleStatus;
   created_at: string;
   updated_at: string;
 }
