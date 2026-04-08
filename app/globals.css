@@ -9,3 +9,26 @@
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
 }
+
+/* CRUD surface utility classes */
+.topbar { @apply border-b border-slate-800 bg-slate-900/70 backdrop-blur; }
+.topbar-inner { @apply mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3; }
+.topbar nav { @apply flex gap-4 text-sm text-slate-300; }
+.topbar a { @apply transition hover:text-accent; }
+.container { @apply mx-auto w-full max-w-6xl p-6 md:p-10; }
+.crud-grid { @apply grid gap-4; }
+.crud-grid.cards { @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-4; }
+.card { @apply rounded-lg border border-slate-800 bg-slate-900/70 p-4; }
+.section { @apply mb-4; }
+.table { @apply min-w-full overflow-hidden rounded-lg border border-slate-800 text-left text-sm; }
+.table th,.table td { @apply border-b border-slate-800 px-3 py-2 align-top; }
+.form { @apply grid gap-3 rounded-lg border border-slate-800 bg-slate-900/70 p-4; }
+.form-row { @apply grid gap-3 md:grid-cols-3; }
+input, select, textarea, button { @apply rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100; }
+button { @apply bg-accent font-medium text-slate-950 hover:opacity-90; }
+.badge { @apply inline-flex rounded-full px-2 py-0.5 text-xs; }
+.badge.red { @apply bg-rose-950 text-rose-200; }
+.badge.yellow { @apply bg-amber-950 text-amber-200; }
+.badge.green { @apply bg-emerald-950 text-emerald-200; }
+.muted { @apply text-sm text-slate-400; }
+.split { @apply grid gap-4 lg:grid-cols-2; }
