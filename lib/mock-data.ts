@@ -3,17 +3,19 @@ import type { Approval, Project, Task, VersionEntry } from './types';
 export const mockProjects: Project[] = [
   {
     id: 'p1',
-    name: 'Spring Product Spot',
+    name: 'TakeOne OS Launch',
+    description: 'Internal rollout for production workflow.',
     status: 'active',
     due_date: '2026-04-21',
-    owner: 'Maya'
+    created_at: '2026-04-01T00:00:00Z'
   },
   {
     id: 'p2',
-    name: 'Social Cutdown Batch',
-    status: 'on_hold',
-    due_date: '2026-04-30',
-    owner: 'Jordan'
+    name: 'Teaser Cut Review',
+    description: 'Track teaser versions and approvals.',
+    status: 'completed',
+    due_date: '2026-04-10',
+    created_at: '2026-04-02T00:00:00Z'
   }
 ];
 
@@ -21,47 +23,39 @@ export const mockTasks: Task[] = [
   {
     id: 't1',
     project_id: 'p1',
-    title: 'Lock script changes',
-    status: 'doing',
-    assignee: 'Ari',
-    due_date: '2026-04-10'
+    title: 'Finalize poster copy',
+    description: 'Lock final poster text for review.',
+    status: 'todo',
+    due_date: '2026-04-18',
+    created_at: '2026-04-03T00:00:00Z'
   },
   {
     id: 't2',
     project_id: 'p1',
-    title: 'Upload V2 cut link',
-    status: 'todo',
-    assignee: 'Noah',
-    due_date: '2026-04-11'
-  },
-  {
-    id: 't3',
-    project_id: 'p2',
-    title: 'Collect client notes',
-    status: 'todo',
-    assignee: 'Maya',
-    due_date: '2026-04-12'
+    title: 'Collect teaser feedback',
+    description: 'Gather comments from director and producer.',
+    status: 'in progress',
+    due_date: '2026-04-16',
+    created_at: '2026-04-03T00:00:00Z'
   }
 ];
 
 export const mockApprovals: Approval[] = [
   {
     id: 'a1',
-    project_id: 'p1',
-    item_title: 'Hero edit V2',
-    requested_by: 'Noah',
-    approver: 'Client Team',
-    status: 'pending',
-    external_asset_url: 'https://drive.google.com/file/d/123'
+    version_id: 'v1',
+    status: 'pending review',
+    comment: 'Waiting for final producer sign-off.',
+    reviewer: 'Producer',
+    created_at: '2026-04-05T00:00:00Z'
   },
   {
     id: 'a2',
-    project_id: 'p2',
-    item_title: 'Instagram 15s v1',
-    requested_by: 'Jordan',
-    approver: 'Internal Brand',
-    status: 'changes_requested',
-    external_asset_url: 'https://www.dropbox.com/s/example'
+    version_id: 'v2',
+    status: 'approved',
+    comment: 'Approved for release.',
+    reviewer: 'Director',
+    created_at: '2026-04-06T00:00:00Z'
   }
 ];
 
@@ -69,17 +63,17 @@ export const mockVersions: VersionEntry[] = [
   {
     id: 'v1',
     project_id: 'p1',
-    item_name: 'Hero edit',
-    version_label: 'v2',
-    changelog: 'Adjusted end card timing and color pass.',
-    external_asset_url: 'https://drive.google.com/file/d/123'
+    item_name: 'Poster',
+    version_label: 'v1',
+    changelog: 'Initial poster draft.',
+    external_asset_url: 'https://example.com/poster-v1'
   },
   {
     id: 'v2',
-    project_id: 'p2',
-    item_name: 'IG 15s',
-    version_label: 'v1',
-    changelog: 'Initial rough cut for review.',
-    external_asset_url: 'https://www.dropbox.com/s/example'
+    project_id: 'p1',
+    item_name: 'Teaser',
+    version_label: 'v2',
+    changelog: 'Updated cut with sound design.',
+    external_asset_url: 'https://example.com/teaser-v2'
   }
 ];
