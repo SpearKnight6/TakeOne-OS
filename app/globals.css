@@ -146,8 +146,74 @@ button {
   grid-template-columns: 1fr;
 }
 
+.campaign-os-helper {
+  margin-bottom: 16px;
+}
+
+.campaign-os-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+.campaign-os-card {
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.campaign-os-title {
+  margin: 0 0 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.campaign-os-form {
+  display: grid;
+  gap: 10px;
+}
+
+.campaign-os-meta-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr;
+}
+
+.campaign-os-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.campaign-os-form input,
+.campaign-os-form select,
+.campaign-os-form textarea {
+  background: #fff;
+  color: #111827;
+}
+
 @media (min-width: 900px) {
   .split {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .campaign-os-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .campaign-os-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .campaign-os-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .campaign-os-meta-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
