@@ -18,14 +18,46 @@ const DEFAULT_CAMPAIGN_LIFECYCLE_PHASES = [
 ] as const;
 
 const DEFAULT_CAMPAIGN_MILESTONES = [
-  { milestone_name: 'First Look', phase: 'Pre-Production' },
-  { milestone_name: 'Title Reveal', phase: 'Pre-Production' },
-  { milestone_name: 'Character Intro', phase: 'Production' },
-  { milestone_name: 'First Song', phase: 'Production' },
-  { milestone_name: 'Teaser', phase: 'Post-Production' },
-  { milestone_name: 'Trailer', phase: 'Launch' },
-  { milestone_name: 'Release Week', phase: 'Launch' },
-  { milestone_name: 'OTT Window', phase: 'Post-Launch' }
+  {
+    milestone_name: 'First Look',
+    phase: 'Pre-Production',
+    notes: 'Primary visual reveal that establishes first signal and premium positioning.'
+  },
+  {
+    milestone_name: 'Title Reveal',
+    phase: 'Pre-Production',
+    notes: 'Reveal title identity, tone, and audience memory anchor.'
+  },
+  {
+    milestone_name: 'Character Intro',
+    phase: 'Production',
+    notes: 'Introduce key character energy and strengthen audience lock.'
+  },
+  {
+    milestone_name: 'First Song',
+    phase: 'Post-Production',
+    notes: 'Music-led social traction asset for recall and repeat engagement.'
+  },
+  {
+    milestone_name: 'Teaser',
+    phase: 'Post-Production',
+    notes: 'First high-impact narrative momentum spike.'
+  },
+  {
+    milestone_name: 'Trailer',
+    phase: 'Launch',
+    notes: 'Major conversion asset before release week.'
+  },
+  {
+    milestone_name: 'Release Week',
+    phase: 'Launch',
+    notes: 'Peak urgency and mass visibility phase.'
+  },
+  {
+    milestone_name: 'OTT Window',
+    phase: 'Post-Launch',
+    notes: 'Second-life momentum and long-tail audience visibility.'
+  }
 ] as const;
 
 export interface DashboardData {
@@ -188,6 +220,7 @@ export async function ensureDefaultCampaignMilestones(projectId: string) {
       project_id: projectId,
       milestone_name: milestone.milestone_name,
       phase: milestone.phase,
+      notes: milestone.notes,
       status: 'not started'
     }));
 
