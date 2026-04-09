@@ -180,13 +180,10 @@ export async function getCampaignMilestonesByProject(projectId: string) {
 
 export async function ensureDefaultCampaignMilestones(projectId: string) {
   const supabase = getSupabase();
-  const { count, error } = await supabase
-    .from('campaign_milestones')
-    .select('id', { count: 'exact', head: true })
-    .eq('project_id', projectId);
+  const { data, error } = await getCampaignMilestonesByProject(projectId);
   if (error) return { data: [] as CampaignMilestone[], error };
 
-  if ((count ?? 0) === 0) {
+  if (data.length === 0) {
     const seed = DEFAULT_CAMPAIGN_MILESTONES.map((milestone) => ({
       project_id: projectId,
       milestone_name: milestone.milestone_name,
@@ -201,5 +198,5 @@ export async function ensureDefaultCampaignMilestones(projectId: string) {
     return getCampaignMilestonesByProject(projectId);
   }
 
-  return getCampaignMilestonesByProject(projectId);
+  return { data, error: null };
 }
