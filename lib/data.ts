@@ -201,10 +201,11 @@ export async function ensureDefaultCampaignLifecycle(projectId: string) {
 
 export async function getCampaignMilestonesByProject(projectId: string) {
   const supabase = getSupabase();
+  const normalizedProjectId = projectId.trim();
   const { data, error } = await supabase
     .from('campaign_milestones')
     .select('*')
-    .eq('project_id', projectId)
+    .eq('project_id', normalizedProjectId)
     .order('created_at', { ascending: true });
 
   return { data: (data ?? []) as CampaignMilestone[], error };
@@ -212,12 +213,13 @@ export async function getCampaignMilestonesByProject(projectId: string) {
 
 export async function ensureDefaultCampaignMilestones(projectId: string) {
   const supabase = getSupabase();
-  const { data, error } = await getCampaignMilestonesByProject(projectId);
+  const normalizedProjectId = projectId.trim();
+  const { data, error } = await getCampaignMilestonesByProject(normalizedProjectId);
   if (error) return { data: [] as CampaignMilestone[], error };
 
   if (data.length === 0) {
     const seed = DEFAULT_CAMPAIGN_MILESTONES.map((milestone) => ({
-      project_id: projectId,
+      project_id: normalizedProjectId,
       milestone_name: milestone.milestone_name,
       phase: milestone.phase,
       notes: milestone.notes,
@@ -226,9 +228,9 @@ export async function ensureDefaultCampaignMilestones(projectId: string) {
 
     const { error: insertError } = await supabase
       .from('campaign_milestones')
-      .upsert(seed, { onConflict: 'project_id,milestone_name', ignoreDuplicates: true });
+      .insert(seed);
     if (insertError) return { data: [] as CampaignMilestone[], error: insertError };
-    return getCampaignMilestonesByProject(projectId);
+    return getCampaignMilestonesByProject(normalizedProjectId);
   }
 
   return { data, error: null };
