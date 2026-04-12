@@ -227,7 +227,11 @@ export async function ensureDefaultCampaignMilestones(projectId: string) {
     const { error: insertError } = await supabase
       .from('campaign_milestones')
       .upsert(seed, { onConflict: 'project_id,milestone_name', ignoreDuplicates: true });
-    if (insertError) return { data: [] as CampaignMilestone[], error: insertError };
+    if (insertError) {
+      // In case another request seeded concurrently, tolerate unique conflicts and return current rows.
+      if (insertError.code === '23505') return getCampaignMilestonesByProject(projectId);
+      return { data: [] as CampaignMilestone[], error: insertError };
+    }
     return getCampaignMilestonesByProject(projectId);
   }
 
