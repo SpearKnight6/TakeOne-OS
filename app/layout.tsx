@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/theme-toggle';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -9,14 +10,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
       <body>
         <header className="topbar">
-          <h1>TakeOne-OS</h1>
-          <nav>
+          <h1 className="brand">TakeOne-OS</h1>
+          <nav className="topbar-nav">
             <Link href="/">Dashboard</Link>
             <Link href="/projects">Projects</Link>
           </nav>
+          <ThemeToggle />
         </header>
         <main className="container">{children}</main>
       </body>

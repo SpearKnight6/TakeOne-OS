@@ -155,7 +155,7 @@ export default async function ProjectDetailPage({
         </div>
       </section>
 
-      <section className="section card">
+      <section className="section card campaign-os-section">
         <div className="campaign-section-head">
           <h3>Campaign OS</h3>
           <div className="campaign-status-summary">
@@ -209,7 +209,7 @@ export default async function ProjectDetailPage({
         )}
       </section>
 
-      <section className="section card">
+      <section className="section card campaign-milestones-section">
         <div className="campaign-section-head">
           <h3>Campaign Milestones</h3>
           <div className="campaign-status-summary">
@@ -274,7 +274,7 @@ export default async function ProjectDetailPage({
         )}
       </section>
 
-      <section className="section card">
+      <section className="section card campaign-lifecycle-section">
         <div className="campaign-section-head">
           <h3>Campaign Lifecycle</h3>
           <div className="campaign-status-summary">
@@ -289,7 +289,7 @@ export default async function ProjectDetailPage({
           {LIFECYCLE_PHASE_ORDER.map((phaseName) => {
             const phase = lifecycleByPhaseName.get(phaseName);
             return (
-              <article key={phaseName} className="lifecycle-phase">
+              <article key={phaseName} className="lifecycle-phase" data-status={phase?.status ?? 'not started'}>
                 <span className="lifecycle-phase-name">{phaseName}</span>
                 <StatusBadge label={phase?.status ?? 'not started'} />
               </article>
@@ -343,7 +343,7 @@ export default async function ProjectDetailPage({
         )}
       </section>
 
-      <section className="section card">
+      <section className="section card tasks-section">
         <h3>Tasks</h3>
         <div className="task-filter-row">
           Filter:
@@ -402,7 +402,7 @@ export default async function ProjectDetailPage({
         </form>
       </section>
 
-      <section className="section card">
+      <section className="section card assets-section">
         <h3>Assets</h3>
         {assets.length === 0 ? <EmptyState message="No assets yet." /> : assets.map((asset) => {
           const versions = versionsByAsset.find((entry) => entry.assetId === asset.id)?.versions ?? [];
