@@ -281,7 +281,7 @@ button:hover {
 }
 
 .project-detail-shell {
-  gap: 24px;
+  gap: 18px;
 }
 
 .project-back-link {
@@ -348,6 +348,18 @@ button:hover {
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
+}
+
+.milestone-linked-assets-field textarea {
+  border-color: color-mix(in oklab, var(--accent), var(--border-strong) 40%);
+}
+
+.milestone-field-helper {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: normal;
+  text-transform: none;
+  font-weight: 500;
 }
 
 .campaign-os-title {
@@ -472,27 +484,6 @@ button:hover {
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
-
-.task-filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-  color: var(--text-secondary);
-}
-
-.task-filter-link {
-  margin-left: 2px;
-}
-
-.task-row-overdue {
-  background: rgba(127, 29, 29, 0.22);
-}
-
-.asset-card {
-  margin-bottom: 16px;
 }
 
 @media (min-width: 900px) {
