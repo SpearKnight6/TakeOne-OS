@@ -1,7 +1,7 @@
 export function StatusBadge({ label }: { label: string }) {
   const normalized = label.toLowerCase();
   const key = normalized.split(':')[0].trim();
-  let tone = 'yellow';
+  let tone = 'gray';
   if (['approved', 'done', 'active', 'completed'].includes(key)) tone = 'green';
   if (['blocked', 'overdue', 'changes requested'].includes(key)) tone = 'red';
   if (['in progress', 'in review'].includes(key)) tone = 'blue';
