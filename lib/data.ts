@@ -217,21 +217,23 @@ export async function ensureDefaultCampaignMilestones(projectId: string) {
   const { data, error } = await getCampaignMilestonesByProject(normalizedProjectId);
   if (error) return { data: [] as CampaignMilestone[], error };
 
-  if (data.length === 0) {
-    const seed = DEFAULT_CAMPAIGN_MILESTONES.map((milestone) => ({
-      project_id: normalizedProjectId,
-      milestone_name: milestone.milestone_name,
-      phase: milestone.phase,
-      notes: milestone.notes,
-      status: 'not started'
-    }));
+  if (data.length > 0) return { data, error: null };
 
-    const { error: insertError } = await supabase
-      .from('campaign_milestones')
-      .insert(seed);
-    if (insertError) return { data: [] as CampaignMilestone[], error: insertError };
-    return getCampaignMilestonesByProject(normalizedProjectId);
-  }
+  const seed = DEFAULT_CAMPAIGN_MILESTONES.map((milestone) => ({
+    project_id: normalizedProjectId,
+    milestone_name: milestone.milestone_name,
+    phase: milestone.phase,
+    notes: milestone.notes,
+    status: 'not started'
+  }));
 
-  return { data, error: null };
+  const { error: upsertError } = await supabase
+    .from('campaign_milestones')
+    .upsert(seed, {
+      onConflict: 'project_id,milestone_name',
+      ignoreDuplicates: true
+    });
+  if (upsertError) return { data: [] as CampaignMilestone[], error: upsertError };
+
+  return getCampaignMilestonesByProject(normalizedProjectId);
 }
