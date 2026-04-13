@@ -103,13 +103,15 @@ export default async function ProjectDetailPage({
   }
 
   return (
-    <div className="grid">
-      <p><Link href="/projects">← Back to projects</Link></p>
+    <div className="grid project-detail-shell">
+      <p className="project-back-link"><Link href="/projects">← Back to projects</Link></p>
 
-      <section className="section card">
-        <h2>{project.name}</h2>
-        <p className="muted">{project.description ?? 'No description.'}</p>
-        <StatusBadge label={project.status} /> <span>Due: {project.due_date ?? '—'}</span>
+      <section className="section card project-hero-card">
+        <h2 className="project-hero-title">{project.name}</h2>
+        <p className="muted project-hero-description">{project.description ?? 'No description.'}</p>
+        <div className="project-hero-meta">
+          <StatusBadge label={project.status} /> <span>Due: {project.due_date ?? '—'}</span>
+        </div>
 
         <h3>Edit project</h3>
         <form action={updateProject} className="form">
@@ -343,10 +345,10 @@ export default async function ProjectDetailPage({
 
       <section className="section card">
         <h3>Tasks</h3>
-        <div>
+        <div className="task-filter-row">
           Filter:
           {['all', 'todo', 'in progress', 'blocked', 'done'].map((status) => (
-            <Link key={status} href={`/projects/${project.id}?status=${encodeURIComponent(status)}`} style={{ marginLeft: 8 }}>
+            <Link key={status} href={`/projects/${project.id}?status=${encodeURIComponent(status)}`} className="task-filter-link">
               {status === taskStatusFilter ? <strong>{status}</strong> : status}
             </Link>
           ))}
@@ -358,7 +360,7 @@ export default async function ProjectDetailPage({
               {tasks.map((task) => {
                 const overdue = isOverdue(task.due_date, task.status);
                 return (
-                  <tr key={task.id} style={overdue ? { background: '#fff1f2' } : undefined}>
+                  <tr key={task.id} className={overdue ? 'task-row-overdue' : undefined}>
                     <td>{task.title}<br /><span className="muted">{task.description}</span></td>
                     <td>{task.due_date ?? '—'} {overdue && <StatusBadge label="overdue" />}</td>
                     <td><StatusBadge label={task.status} /></td>
@@ -408,7 +410,7 @@ export default async function ProjectDetailPage({
           const latestApproved = versions.find((v) => v.status === 'approved');
 
           return (
-            <article key={asset.id} className="card" style={{ marginBottom: 12 }}>
+            <article key={asset.id} className="card asset-card">
               <h4>{asset.title} <span className="muted">({asset.asset_type})</span></h4>
               <p>{asset.description}</p>
               <p><a href={asset.external_file_url} target="_blank">External file link</a></p>
