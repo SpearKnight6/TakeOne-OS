@@ -42,9 +42,13 @@ export default function LoginPage() {
 
   return (
     <div className="auth-shell">
+      <div className="auth-intro">
+        <p className="auth-headline">Control your film&rsquo;s momentum.</p>
+        <p className="auth-subheadline">From first signal to post-release impact.</p>
+      </div>
       <section className="auth-card card">
         <p className="auth-eyebrow">TakeOne OS</p>
-        <h2>Sign in to your campaign command center</h2>
+        <h2>Enter your film campaign command center</h2>
         <p className="muted">Use your work email to receive a secure magic link.</p>
 
         <form className="form" onSubmit={onSubmit}>
@@ -59,8 +63,11 @@ export default function LoginPage() {
               required
             />
           </label>
-          <button type="submit" disabled={loading}>{loading ? 'Sending…' : 'Send magic link'}</button>
+          <button className="auth-submit" type="submit" disabled={loading}>
+            {loading ? 'Sending…' : 'Access your command center'}
+          </button>
         </form>
+        <p className="auth-supporting-text">Used by marketing, production, and distribution teams.</p>
 
         {message ? <p className="auth-success">{message}</p> : null}
         {error ? <p className="auth-error">{error}</p> : null}

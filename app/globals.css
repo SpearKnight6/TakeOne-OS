@@ -337,11 +337,49 @@ button:hover {
   display: grid;
   place-items: center;
   min-height: calc(100vh - 180px);
+  position: relative;
+  overflow: hidden;
+  padding: 18px 0;
+  gap: 18px;
+}
+
+.auth-shell::before {
+  content: '';
+  position: absolute;
+  inset: 8% 10% auto;
+  height: 260px;
+  background: radial-gradient(circle at top, color-mix(in oklab, var(--accent), transparent 78%), transparent 72%);
+  pointer-events: none;
+  filter: blur(14px);
+}
+
+.auth-intro {
+  width: min(640px, 100%);
+  text-align: center;
+  z-index: 1;
+}
+
+.auth-headline {
+  margin: 0;
+  font-size: clamp(1.8rem, 4.2vw, 2.7rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  font-weight: 750;
+}
+
+.auth-subheadline {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
 }
 
 .auth-card {
   width: min(520px, 100%);
   padding: 28px;
+  z-index: 1;
+  border-color: color-mix(in oklab, var(--accent), var(--border) 82%);
+  background: linear-gradient(160deg, color-mix(in oklab, var(--surface), white 2%), color-mix(in oklab, var(--surface), black 4%));
+  box-shadow: 0 26px 48px rgba(2, 6, 23, 0.48);
 }
 
 .auth-eyebrow {
@@ -361,6 +399,36 @@ button:hover {
 .auth-error {
   color: #f87171;
   margin-top: 4px;
+}
+
+.auth-submit {
+  background: color-mix(in oklab, var(--accent), black 6%);
+  border-color: color-mix(in oklab, var(--accent), black 30%);
+  color: #081306;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent), transparent 55%), 0 0 22px color-mix(in oklab, var(--accent), transparent 68%);
+}
+
+.auth-submit:hover {
+  filter: brightness(1.03);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent), transparent 48%), 0 0 28px color-mix(in oklab, var(--accent), transparent 62%);
+}
+
+.auth-submit:focus-visible {
+  outline: 3px solid color-mix(in oklab, var(--accent), white 25%);
+  outline-offset: 2px;
+}
+
+.auth-submit:disabled {
+  opacity: 0.72;
+  cursor: progress;
+  box-shadow: none;
+}
+
+.auth-supporting-text {
+  margin: 14px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-align: center;
 }
 
 .project-list-shell {
