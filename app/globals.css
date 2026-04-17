@@ -333,57 +333,158 @@ button:hover {
   grid-template-columns: 1fr;
 }
 
+
 .auth-shell {
   display: grid;
-  place-items: center;
-  min-height: calc(100vh - 180px);
+  grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.92fr);
+  align-items: center;
+  gap: clamp(22px, 3.8vw, 58px);
+  min-height: calc(100vh - 160px);
   position: relative;
   overflow: hidden;
-  padding: 18px 0;
-  gap: 18px;
+  padding: clamp(18px, 3vw, 40px) 0;
 }
 
 .auth-shell::before {
   content: '';
   position: absolute;
-  inset: 8% 10% auto;
-  height: 260px;
-  background: radial-gradient(circle at top, color-mix(in oklab, var(--accent), transparent 78%), transparent 72%);
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 22%, color-mix(in oklab, var(--accent), transparent 86%), transparent 48%),
+    radial-gradient(circle at 72% 76%, color-mix(in oklab, var(--accent), transparent 92%), transparent 46%),
+    linear-gradient(126deg, color-mix(in oklab, var(--bg), black 8%), transparent 62%);
   pointer-events: none;
-  filter: blur(14px);
 }
 
-.auth-intro {
-  width: min(640px, 100%);
-  text-align: center;
+.auth-brand-column {
+  position: relative;
   z-index: 1;
+  display: grid;
+  gap: 14px;
+  align-content: center;
+  max-width: 680px;
 }
 
 .auth-headline {
   margin: 0;
-  font-size: clamp(1.8rem, 4.2vw, 2.7rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  font-weight: 750;
+  font-size: clamp(2.1rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  font-weight: 780;
 }
 
 .auth-subheadline {
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--text-secondary);
-  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  font-size: clamp(1.02rem, 2.25vw, 1.35rem);
+  letter-spacing: 0.01em;
+}
+
+.auth-lede {
+  margin: 0;
+  max-width: 62ch;
+  color: color-mix(in oklab, var(--text-secondary), white 10%);
+  font-size: 0.98rem;
+}
+
+.auth-hero-frame {
+  position: relative;
+  margin-top: clamp(10px, 2vw, 20px);
+  width: min(100%, 620px);
+  min-height: clamp(210px, 30vw, 340px);
+  border-radius: 28px;
+  border: 1px solid color-mix(in oklab, var(--accent), var(--border) 86%);
+  background:
+    linear-gradient(160deg, color-mix(in oklab, var(--surface), black 2%), color-mix(in oklab, var(--surface), black 10%)),
+    radial-gradient(circle at 20% 20%, color-mix(in oklab, var(--accent), transparent 86%), transparent 42%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--text-primary), transparent 88%),
+    0 22px 44px rgba(2, 6, 23, 0.45);
+}
+
+.auth-hero-frame::before,
+.auth-hero-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.auth-hero-frame::before {
+  background:
+    radial-gradient(circle at 30% 34%, color-mix(in oklab, var(--accent), transparent 78%) 0%, transparent 44%),
+    radial-gradient(circle at 72% 66%, color-mix(in oklab, var(--accent), transparent 86%) 0%, transparent 42%);
+  filter: blur(12px);
+  opacity: 0.7;
+}
+
+.auth-hero-frame::after {
+  opacity: 0.26;
+  background-image: radial-gradient(circle, color-mix(in oklab, var(--text-secondary), transparent 70%) 0.8px, transparent 0.8px);
+  background-size: 14px 14px;
+  animation: heroGrainDrift 20s linear infinite;
+}
+
+.auth-hero-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(210px, 30vw, 340px);
+}
+
+.hero-grid {
+  transform-origin: 50% 50%;
+  animation: heroPulse 24s ease-in-out infinite;
+}
+
+.hero-glyph {
+  opacity: 0;
+  fill: color-mix(in oklab, var(--accent), white 18%);
+  transform-origin: 110px 100px;
+  animation: heroGlyphCycle 24s cubic-bezier(0.39, 0.58, 0.57, 1) infinite;
+}
+
+.hero-glyph circle {
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--accent), transparent 35%));
+}
+
+.glyph-clapboard {
+  animation-delay: 0s;
+}
+
+.glyph-frame {
+  animation-delay: 4.8s;
+}
+
+.glyph-play {
+  animation-delay: 9.6s;
+}
+
+.glyph-spotlight {
+  animation-delay: 14.4s;
+}
+
+.glyph-poster {
+  animation-delay: 19.2s;
 }
 
 .auth-card {
-  width: min(520px, 100%);
-  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  justify-self: end;
   z-index: 1;
+  padding: clamp(22px, 2.2vw, 30px);
   border-color: color-mix(in oklab, var(--accent), var(--border) 82%);
   background: linear-gradient(160deg, color-mix(in oklab, var(--surface), white 2%), color-mix(in oklab, var(--surface), black 4%));
-  box-shadow: 0 26px 48px rgba(2, 6, 23, 0.48);
+  box-shadow:
+    0 26px 48px rgba(2, 6, 23, 0.48),
+    0 0 0 1px color-mix(in oklab, var(--accent), transparent 88%);
 }
 
 .auth-eyebrow {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -391,14 +492,87 @@ button:hover {
   font-weight: 700;
 }
 
+.auth-card h2 {
+  margin: 0;
+  font-size: clamp(1.32rem, 1.75vw, 1.62rem);
+  line-height: 1.2;
+}
+
+.auth-mode-switch {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.auth-mode-button {
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: color-mix(in oklab, var(--surface), black 4%);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-strong);
+}
+
+.auth-mode-button.is-active {
+  color: var(--text-primary);
+  border-color: color-mix(in oklab, var(--accent), var(--border) 40%);
+  background: color-mix(in oklab, var(--surface), var(--accent) 11%);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent), transparent 48%);
+}
+
+.auth-google-button {
+  width: 100%;
+  margin-top: 12px;
+  background: color-mix(in oklab, var(--surface), black 2%);
+  color: var(--text-primary);
+  border-color: color-mix(in oklab, var(--accent), var(--border) 78%);
+}
+
+.auth-google-button:hover {
+  border-color: color-mix(in oklab, var(--accent), var(--border) 42%);
+}
+
+.auth-divider {
+  position: relative;
+  margin: 16px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  border-top: 1px solid color-mix(in oklab, var(--border-strong), transparent 20%);
+  z-index: 0;
+}
+
+.auth-divider span {
+  position: relative;
+  z-index: 1;
+  padding: 0 10px;
+  background: var(--surface);
+}
+
+.auth-form {
+  box-shadow: none;
+  border-radius: 14px;
+  border-color: color-mix(in oklab, var(--border), var(--accent) 10%);
+  background: color-mix(in oklab, var(--surface), black 5%);
+}
+
 .auth-success {
-  color: #16a34a;
-  margin-top: 4px;
+  color: #4ade80;
+  margin-top: 10px;
 }
 
 .auth-error {
   color: #f87171;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
 .auth-submit {
@@ -418,17 +592,128 @@ button:hover {
   outline-offset: 2px;
 }
 
-.auth-submit:disabled {
+.auth-submit:disabled,
+.auth-google-button:disabled {
   opacity: 0.72;
   cursor: progress;
   box-shadow: none;
 }
 
 .auth-supporting-text {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   text-align: center;
+}
+
+@keyframes heroGlyphCycle {
+  0%,
+  13% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+  18%,
+  26% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  32%,
+  100% {
+    opacity: 0;
+    transform: translateY(-7px) scale(1.012);
+  }
+}
+
+@keyframes heroPulse {
+  0%,
+  100% {
+    transform: scale(0.985) translateY(4px);
+  }
+  50% {
+    transform: scale(1) translateY(-3px);
+  }
+}
+
+@keyframes heroGrainDrift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-8px, -6px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@media (max-width: 1020px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    min-height: auto;
+  }
+
+  .auth-brand-column {
+    max-width: none;
+  }
+
+  .auth-card {
+    justify-self: stretch;
+    max-width: none;
+  }
+
+  .auth-headline {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .auth-hero-frame {
+    width: 100%;
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-shell {
+    padding-top: 6px;
+  }
+
+  .auth-headline {
+    font-size: clamp(1.9rem, 9vw, 2.5rem);
+  }
+
+  .auth-subheadline {
+    font-size: 1rem;
+  }
+
+  .auth-lede {
+    font-size: 0.93rem;
+  }
+
+  .auth-hero-frame {
+    min-height: 184px;
+    border-radius: 20px;
+  }
+
+  .auth-hero-frame::after {
+    opacity: 0.18;
+  }
+
+  .auth-mode-switch {
+    margin-top: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid,
+  .hero-glyph,
+  .auth-hero-frame::after {
+    animation: none;
+  }
+
+  .hero-glyph.glyph-clapboard {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .project-list-shell {
