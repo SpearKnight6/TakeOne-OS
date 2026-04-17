@@ -2,20 +2,51 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { getSupabase } from '@/lib/supabase';
+import { getServerSupabase } from '@/lib/supabase/server';
 
 function text(formData: FormData, key: string) {
   return (formData.get(key) as string | null)?.trim() ?? '';
 }
 
+async function requireAuthenticatedUser() {
+  const supabase = getServerSupabase();
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    throw new Error('You must be signed in to continue.');
+  }
+
+  return { supabase, user };
+}
+
+async function assertProjectOwnership(projectId: string, ownerId: string) {
+  const { supabase } = await requireAuthenticatedUser();
+  const { data, error } = await supabase.from('projects').select('id').eq('id', projectId).eq('owner_id', ownerId).single();
+
+  if (error || !data) {
+    throw new Error('Project not found or not accessible for this account.');
+  }
+}
+
+export async function signOut() {
+  const { supabase } = await requireAuthenticatedUser();
+  await supabase.auth.signOut();
+  redirect('/login');
+}
+
 export async function createProject(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const payload = {
     name: text(formData, 'name'),
     description: text(formData, 'description') || null,
     status: text(formData, 'status') || 'active',
-    due_date: text(formData, 'due_date') || null
+    due_date: text(formData, 'due_date') || null,
+    owner_id: user.id
   };
+
   const { data, error } = await supabase.from('projects').insert(payload).select('id').single();
   if (error) throw new Error(error.message);
   revalidatePath('/projects');
@@ -23,23 +54,29 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const id = text(formData, 'id');
+
+  await assertProjectOwnership(id, user.id);
+
   const updates = {
     name: text(formData, 'name'),
     description: text(formData, 'description') || null,
     status: text(formData, 'status'),
-    due_date: text(formData, 'due_date') || null
+    due_date: text(formData, 'due_date') || null,
+    updated_at: new Date().toISOString()
   };
-  const { error } = await supabase.from('projects').update(updates).eq('id', id);
+  const { error } = await supabase.from('projects').update(updates).eq('id', id).eq('owner_id', user.id);
   if (error) throw new Error(error.message);
   revalidatePath('/projects');
   revalidatePath(`/projects/${id}`);
 }
 
 export async function createTask(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const payload = {
     project_id: projectId,
     title: text(formData, 'title'),
@@ -54,9 +91,11 @@ export async function createTask(formData: FormData) {
 }
 
 export async function updateTaskStatus(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const id = text(formData, 'id');
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const { error } = await supabase.from('tasks').update({ status: text(formData, 'status') }).eq('id', id);
   if (error) throw new Error(error.message);
   revalidatePath('/');
@@ -64,8 +103,10 @@ export async function updateTaskStatus(formData: FormData) {
 }
 
 export async function createAsset(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const payload = {
     project_id: projectId,
     title: text(formData, 'title'),
@@ -80,8 +121,10 @@ export async function createAsset(formData: FormData) {
 }
 
 export async function createAssetVersion(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const payload = {
     asset_id: text(formData, 'asset_id'),
     version_number: text(formData, 'version_number'),
@@ -96,8 +139,10 @@ export async function createAssetVersion(formData: FormData) {
 }
 
 export async function createApproval(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const payload = {
     version_id: text(formData, 'version_id'),
     status: text(formData, 'status'),
@@ -111,9 +156,11 @@ export async function createApproval(formData: FormData) {
 }
 
 export async function upsertCampaignPillar(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const id = text(formData, 'id');
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const updates = {
     objective: text(formData, 'objective') || null,
     notes: text(formData, 'notes') || null,
@@ -129,9 +176,11 @@ export async function upsertCampaignPillar(formData: FormData) {
 }
 
 export async function upsertCampaignLifecycle(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const id = text(formData, 'id');
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const updates = {
     objective: text(formData, 'objective') || null,
     social_strategy: text(formData, 'social_strategy') || null,
@@ -148,9 +197,11 @@ export async function upsertCampaignLifecycle(formData: FormData) {
 }
 
 export async function upsertCampaignMilestone(formData: FormData) {
-  const supabase = getSupabase();
+  const { supabase, user } = await requireAuthenticatedUser();
   const id = text(formData, 'id');
   const projectId = text(formData, 'project_id');
+  await assertProjectOwnership(projectId, user.id);
+
   const updates = {
     milestone_name: text(formData, 'milestone_name'),
     phase: text(formData, 'phase') || null,

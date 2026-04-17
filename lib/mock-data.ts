@@ -6,16 +6,20 @@ export const mockProjects: Project[] = [
     name: 'TakeOne OS Launch',
     description: 'Internal rollout for production workflow.',
     status: 'active',
+    owner_id: 'mock-user',
     due_date: '2026-04-21',
-    created_at: '2026-04-01T00:00:00Z'
+    created_at: '2026-04-01T00:00:00Z',
+    updated_at: '2026-04-10T00:00:00Z'
   },
   {
     id: 'p2',
     name: 'Teaser Cut Review',
     description: 'Track teaser versions and approvals.',
     status: 'completed',
+    owner_id: 'mock-user',
     due_date: '2026-04-10',
-    created_at: '2026-04-02T00:00:00Z'
+    created_at: '2026-04-02T00:00:00Z',
+    updated_at: '2026-04-11T00:00:00Z'
   }
 ];
 

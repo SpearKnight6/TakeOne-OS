@@ -12,7 +12,9 @@ export interface Project {
   description: string | null;
   status: ProjectStatus;
   due_date: string | null;
+  owner_id: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface Task {
