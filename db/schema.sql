@@ -3,6 +3,7 @@ create extension if not exists pgcrypto;
 
 create table if not exists projects (
   id uuid primary key default gen_random_uuid(),
+  owner_id uuid not null references auth.users(id) on delete cascade,
   name text not null,
   description text,
   status text not null default 'active',
@@ -10,6 +11,8 @@ create table if not exists projects (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+create index if not exists idx_projects_owner_id on projects(owner_id);
 
 create table if not exists tasks (
   id uuid primary key default gen_random_uuid(),
@@ -98,6 +101,7 @@ create index if not exists idx_campaign_milestones_project_id on campaign_milest
 alter table campaign_pillars enable row level security;
 alter table campaign_lifecycle enable row level security;
 alter table campaign_milestones enable row level security;
+alter table projects enable row level security;
 
 drop policy if exists "campaign pillars public access" on campaign_pillars;
 create policy "campaign pillars public access" on campaign_pillars
@@ -116,3 +120,9 @@ create policy "campaign milestones public access" on campaign_milestones
 for all
 using (auth.role() in ('anon', 'authenticated'))
 with check (auth.role() in ('anon', 'authenticated'));
+
+drop policy if exists "projects owner access" on projects;
+create policy "projects owner access" on projects
+for all
+using (auth.uid() = owner_id)
+with check (auth.uid() = owner_id);
