@@ -394,14 +394,14 @@ button:hover {
   width: min(100%, 620px);
   min-height: clamp(210px, 30vw, 340px);
   border-radius: 28px;
-  border: 1px solid color-mix(in oklab, var(--accent), var(--border) 86%);
+  border: 1px solid color-mix(in oklab, #a3ff12, var(--border) 88%);
   background:
-    linear-gradient(160deg, color-mix(in oklab, var(--surface), black 2%), color-mix(in oklab, var(--surface), black 10%)),
-    radial-gradient(circle at 20% 20%, color-mix(in oklab, var(--accent), transparent 86%), transparent 42%);
+    linear-gradient(165deg, #111 0%, #0f0f0f 70%, #0d0d0d 100%),
+    radial-gradient(circle at 20% 15%, color-mix(in oklab, #a3ff12, transparent 92%), transparent 46%);
   overflow: hidden;
   box-shadow:
-    inset 0 1px 0 color-mix(in oklab, var(--text-primary), transparent 88%),
-    0 22px 44px rgba(2, 6, 23, 0.45);
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 46px rgba(2, 6, 23, 0.52);
 }
 
 .auth-hero-frame::before,
@@ -414,60 +414,58 @@ button:hover {
 
 .auth-hero-frame::before {
   background:
-    radial-gradient(circle at 30% 34%, color-mix(in oklab, var(--accent), transparent 78%) 0%, transparent 44%),
-    radial-gradient(circle at 72% 66%, color-mix(in oklab, var(--accent), transparent 86%) 0%, transparent 42%);
-  filter: blur(12px);
-  opacity: 0.7;
+    radial-gradient(circle at 26% 24%, color-mix(in oklab, #a3ff12, transparent 91%) 0%, transparent 42%),
+    radial-gradient(circle at 74% 78%, color-mix(in oklab, #a3ff12, transparent 95%) 0%, transparent 40%);
+  filter: blur(16px);
+  opacity: 0.88;
 }
 
 .auth-hero-frame::after {
-  opacity: 0.26;
-  background-image: radial-gradient(circle, color-mix(in oklab, var(--text-secondary), transparent 70%) 0.8px, transparent 0.8px);
-  background-size: 14px 14px;
-  animation: heroGrainDrift 20s linear infinite;
+  inset: 10px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in oklab, #a3ff12, transparent 95%);
+  opacity: 0.6;
 }
 
-.auth-hero-svg {
-  display: block;
+.campaign-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.6vw, 16px);
+  padding: clamp(16px, 2.2vw, 24px);
   width: 100%;
-  height: 100%;
   min-height: clamp(210px, 30vw, 340px);
+  align-content: center;
 }
 
-.hero-grid {
-  transform-origin: 50% 50%;
-  animation: heroPulse 24s ease-in-out infinite;
-}
-
-.hero-glyph {
+.campaign-block {
+  --delay-step: calc(var(--asset-index, 0) * 1.25s);
   opacity: 0;
-  fill: color-mix(in oklab, var(--accent), white 18%);
-  transform-origin: 110px 100px;
-  animation: heroGlyphCycle 24s cubic-bezier(0.39, 0.58, 0.57, 1) infinite;
+  min-height: clamp(72px, 10vw, 92px);
+  border-radius: 12px;
+  border: 1px solid rgba(163, 255, 18, 0.16);
+  background:
+    linear-gradient(165deg, rgba(24, 24, 24, 0.96) 0%, rgba(12, 12, 12, 0.94) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 10px 20px rgba(0, 0, 0, 0.34);
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  animation:
+    campaignBlockReveal 1.1s ease forwards var(--delay-step),
+    campaignBreathingGlow 8.5s ease-in-out infinite calc(7.2s + var(--delay-step));
 }
 
-.hero-glyph circle {
-  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--accent), transparent 35%));
-}
-
-.glyph-clapboard {
-  animation-delay: 0s;
-}
-
-.glyph-frame {
-  animation-delay: 4.8s;
-}
-
-.glyph-play {
-  animation-delay: 9.6s;
-}
-
-.glyph-spotlight {
-  animation-delay: 14.4s;
-}
-
-.glyph-poster {
-  animation-delay: 19.2s;
+.campaign-block-label {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, white, #c6c6c6 34%);
+  font-weight: 500;
+  opacity: 0.92;
 }
 
 .auth-card {
@@ -606,43 +604,50 @@ button:hover {
   text-align: center;
 }
 
-@keyframes heroGlyphCycle {
-  0%,
-  13% {
+@keyframes campaignBlockReveal {
+  0% {
     opacity: 0;
-    transform: translateY(6px) scale(0.985);
+    transform: translateY(8px) scale(0.985);
+    border-color: rgba(163, 255, 18, 0.1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      0 10px 20px rgba(0, 0, 0, 0.26);
   }
-  18%,
-  26% {
+  68% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    border-color: rgba(163, 255, 18, 0.48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 0 18px rgba(163, 255, 18, 0.26),
+      0 14px 26px rgba(0, 0, 0, 0.38);
   }
-  32%,
   100% {
-    opacity: 0;
-    transform: translateY(-7px) scale(1.012);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    border-color: rgba(163, 255, 18, 0.3);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 10px rgba(163, 255, 18, 0.16),
+      0 12px 24px rgba(0, 0, 0, 0.34);
   }
 }
 
-@keyframes heroPulse {
+@keyframes campaignBreathingGlow {
   0%,
   100% {
-    transform: scale(0.985) translateY(4px);
+    border-color: rgba(163, 255, 18, 0.22);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 10px rgba(163, 255, 18, 0.14),
+      0 12px 24px rgba(0, 0, 0, 0.34);
   }
   50% {
-    transform: scale(1) translateY(-3px);
-  }
-}
-
-@keyframes heroGrainDrift {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(-8px, -6px);
-  }
-  100% {
-    transform: translate(0, 0);
+    border-color: rgba(163, 255, 18, 0.4);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 0 18px rgba(163, 255, 18, 0.24),
+      0 14px 26px rgba(0, 0, 0, 0.38);
   }
 }
 
@@ -694,8 +699,16 @@ button:hover {
     border-radius: 20px;
   }
 
-  .auth-hero-frame::after {
-    opacity: 0.18;
+  .campaign-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 184px;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .campaign-block {
+    min-height: 62px;
+    border-radius: 10px;
   }
 
   .auth-mode-switch {
@@ -704,15 +717,11 @@ button:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-grid,
-  .hero-glyph,
-  .auth-hero-frame::after {
+  .campaign-block {
     animation: none;
-  }
-
-  .hero-glyph.glyph-clapboard {
     opacity: 1;
     transform: none;
+    border-color: rgba(163, 255, 18, 0.3);
   }
 }
 
